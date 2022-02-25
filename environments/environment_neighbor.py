@@ -31,38 +31,43 @@ class MultiAgentEnv(gym.Env):
         # configure spaces
         self.action_space = []
         self.observation_space = []
-        for i, agent in enumerate(self.agents):
-            #self.action_space.append(spaces.Discrete(5))
+        for i in range(5):
+            self.action_space.append(spaces.Discrete(5))
+
+        for i in range(self.n):
             self.observation_space.append(spaces.MultiBinary(5 * self.world.deadlines))
 
 
     def step(self, action_n):
-        obs_n = []
-        reward_n = []
-        done_n = []
-        info_n = []
-        self.agents = self.world.policy_agents
-        # set action for each agent
-        for i, agent in enumerate(self.agents):
-            self._set_action(action_n[i], agent)
+
+        agent = self.world.agents[self.agent_id]
+        for i in self.action_agents:
+            self._set_action(action_n[i], self.agents[i])
+
         # advance world state
-        self.world.step()
+        self.world.step(self.action_agents)
+        obs_n = [[] for i in range(self.n)]
+        obs_n[self.agent_id] = self._get_obs(self.agent_id)
+
         # record observation for each agent
-        for agent in self.agents:
-            obs_n.append(self._get_obs(agent))
-            reward_n.append(self._get_reward(agent))
-            done_n.append(self._get_done(agent))
-            info_n.append(self._get_info(agent))
+        self_agent_neg = list(np.where(self.world.agents[self.agent_id].spin_mask == 1)[0])
+        for other in self_agent_neg:
+            obs_n[other] = self._get_obs(other)
 
-        return obs_n, reward_n, done_n, info_n
+        reward = self._get_reward(self.agent_id)
+        for i in self.action_agents:
+            self.agents[i].transmit_succ = False
 
-    def reset(self):
-        self.reset_callback(self.world)
-        obs_n = []
-        self.agents = self.world.policy_agents
-        for agent in self.agents:
-            obs_n.append(self._get_obs(agent))
-        return obs_n
+        return obs_n, reward, None, None
+
+    def reset(self, agent_id):
+        self.agent_id = agent_id
+        self.action_agents, self.neighbor = self.reset_callback(self.world, self.agent_id)
+        obs_n = [[] for i in range(self.n)]
+        for i in self.action_agents:
+            obs_n[i] = self._get_obs(i)
+
+        return obs_n, self.neighbor
 
     # get info used for benchmarking
     def _get_info(self, agent):
@@ -71,10 +76,10 @@ class MultiAgentEnv(gym.Env):
         return self.info_callback(agent, self.world)
 
     # get observation for a particular agent
-    def _get_obs(self, agent):
+    def _get_obs(self, i):
         if self.observation_callback is None:
             return np.zeros(0)
-        return self.observation_callback(agent, self.world)
+        return self.observation_callback(i, self.world)
 
     # get dones for a particular agent
     # unused right now -- agents are allowed to go beyond the viewing screen
@@ -84,27 +89,29 @@ class MultiAgentEnv(gym.Env):
         return self.done_callback(agent, self.world)
 
     # get reward for a particular agent
-    def _get_reward(self, agent):
+    def _get_reward(self, i):
         if self.reward_callback is None:
             return 0.0
-        ret = self.reward_callback(agent, self.world)
+        ret = self.reward_callback(i, self.world)
         # print("ass", agent.color)
         return ret
 
     # set env action for a particular agent
     def _set_action(self, action, agent):
-        agent.action.a = action
-        # if action[0] <= 0.2:
-        #     agent.action.a = 0
-        #
-        # if action[0] > 0.2 and action[0] <= 0.4:
-        #     agent.action.a = 1
-        #
-        # if action[0] > 0.4 and action[0] <= 0.6:
-        #     agent.action.a = 2
-        #
-        # if action[0] > 0.6 and action[0] <= 0.8:
-        #     agent.action.a = 3
-        #
-        # if action[0] > 0.8:
-        #     agent.action.a = 4
+        # print(action)
+        # agent.action.a = action
+
+        if action[0] <= 0.2:
+            agent.action.a = -1
+
+        if action[0] > 0.2 and action[0] <= 0.4:
+            agent.action.a = agent.state.access[0]
+
+        if action[0] > 0.4 and action[0] <= 0.6:
+            agent.action.a = agent.state.access[1]
+
+        if action[0] > 0.6 and action[0] <= 0.8:
+            agent.action.a = agent.state.access[2]
+
+        if action[0] > 0.8:
+            agent.action.a = agent.state.access[3]

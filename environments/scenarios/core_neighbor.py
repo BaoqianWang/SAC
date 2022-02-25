@@ -64,14 +64,15 @@ class UserWorld(object):
     return [agent for agent in self.agents if agent.action_callback is not None]
 
   # update state of the world
-  def step(self):
+  def step(self, action_agents):
 
     # update agent state, and to the global_state
-    for agent in self.agents:
-      self.update_agent_state(agent)
+    for index in action_agents:
+      self.update_agent_state(self.agents[index])
 
   def update_agent_state(self, agent):
       sent = False
+
 
       if agent.action.a > 0 and any([value > 0 for value in agent.state.packets]):
           sent = True

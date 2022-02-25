@@ -128,7 +128,7 @@ class Learner():
             Q_value.append(self.Q[cur_input])
             self.observation.append(cur_obs)
             self.actions.append(cur_neighbor_action[0])
-
+        #print(Q_value)
         return Q_value
 
 

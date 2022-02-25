@@ -105,7 +105,7 @@ if __name__=="__main__":
                 num_neighbor = len(env.world.agents[k].neighbors)
                 for neighbor in env.world.agents[k].neighbors:
                     neighbor_Q_value = [(neighbor_Q_value[i] + Q_values[neighbor][i]) for i in range(steps)]
-                neighbor_Q_value = [value/num_neighbor for value in neighbor_Q_value]
+                neighbor_Q_value = [steps*gamma**i*value/num_neighbor for i, value in enumerate(neighbor_Q_value)]
                 neighbor_Q_values.append(neighbor_Q_value)
 
 

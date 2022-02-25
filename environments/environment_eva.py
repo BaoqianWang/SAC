@@ -31,8 +31,8 @@ class MultiAgentEnv(gym.Env):
         # configure spaces
         self.action_space = []
         self.observation_space = []
-        for i, agent in enumerate(self.agents):
-            #self.action_space.append(spaces.Discrete(5))
+        for i in range(5):
+            self.action_space.append(spaces.Discrete(5))
             self.observation_space.append(spaces.MultiBinary(5 * self.world.deadlines))
 
 
@@ -53,6 +53,8 @@ class MultiAgentEnv(gym.Env):
             reward_n.append(self._get_reward(agent))
             done_n.append(self._get_done(agent))
             info_n.append(self._get_info(agent))
+            agent.transmit_succ = False
+
 
         return obs_n, reward_n, done_n, info_n
 
@@ -93,18 +95,18 @@ class MultiAgentEnv(gym.Env):
 
     # set env action for a particular agent
     def _set_action(self, action, agent):
-        agent.action.a = action
-        # if action[0] <= 0.2:
-        #     agent.action.a = 0
-        #
-        # if action[0] > 0.2 and action[0] <= 0.4:
-        #     agent.action.a = 1
-        #
-        # if action[0] > 0.4 and action[0] <= 0.6:
-        #     agent.action.a = 2
-        #
-        # if action[0] > 0.6 and action[0] <= 0.8:
-        #     agent.action.a = 3
-        #
-        # if action[0] > 0.8:
-        #     agent.action.a = 4
+        # agent.action.a = action
+        if action[0] <= 0.2:
+            agent.action.a = -1
+
+        if action[0] > 0.2 and action[0] <= 0.4:
+            agent.action.a = agent.state.access[0]
+
+        if action[0] > 0.4 and action[0] <= 0.6:
+            agent.action.a = agent.state.access[1]
+
+        if action[0] > 0.6 and action[0] <= 0.8:
+            agent.action.a = agent.state.access[2]
+
+        if action[0] > 0.8:
+            agent.action.a = agent.state.access[3]
