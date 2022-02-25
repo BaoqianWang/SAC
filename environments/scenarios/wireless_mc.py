@@ -42,10 +42,14 @@ class Scenario():
             agent.color = np.array([0.35, 0.35, 0.85])
             agent.state.id = i
             agent.state.p_pos = np.where(world_mat == i)
-            agent.state.packets = [np.random.choice(2) for i in range(self.deadlines)]
+            #agent.state.packets = [np.random.choice(2) for i in range(self.deadlines)]
             agent.spin_mask = np.zeros(world.num_agents)
             agent.access_rate = world.transmit_rate
             agent.arrival_rate = world.arrival_rate[i]
+            #agent.state.packets = [0 for i in range(self.deadlines)]
+            # if np.random.rand() < agent.arrival_rate:
+            #     agent.state.packets[-1] = 1
+            agent.state.packets = [np.random.choice(2) for i in range(self.deadlines)]
             #print(world.num_agents)
             self._calc_mask(agent, world.shape_size)
             #print(agent.spin_mask)

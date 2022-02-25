@@ -11,3 +11,6 @@ c = b.tolist()
 d = tuple(c)
 
 print(c, d)
+
+s = np.random.binomial(1, 0.5, 20)
+print(s)

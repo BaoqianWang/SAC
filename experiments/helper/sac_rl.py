@@ -27,7 +27,7 @@ class MultiAccessNetworkRL:
 
     def train(self, k = 1, M = 10000, T = 20, evalInterval = 500, restartIntervalQ = 50, restartIntervalPolicy = 50, evalM = 500, clearPolicy = True):
 
-
+        #print(T)
         policyRewardList = []
         policyRewardSmooth = []
 
@@ -115,7 +115,7 @@ class MultiAccessNetworkRL:
                 tmpReward += self.nodeList[i].reward[-1]
 
             #discountedReward.append(tmpReward)
-
+            #print(T)
             for t in range(T):
                 for i in range(self.nodeNum): #update state-action
                     self.nodeList[i].updateState()

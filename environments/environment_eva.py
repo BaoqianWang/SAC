@@ -28,11 +28,12 @@ class MultiAgentEnv(gym.Env):
         self.done_callback = done_callback
         # environment parameters
         self.discrete_action_space = True
+        self.action_set = [-1, 0, 1, 2, 3]
         # configure spaces
         self.action_space = []
         self.observation_space = []
         for i in range(5):
-            self.action_space.append(spaces.Discrete(5))
+            self.action_space.append(spaces.Discrete(2))
             self.observation_space.append(spaces.MultiBinary(5 * self.world.deadlines))
 
 
@@ -95,6 +96,13 @@ class MultiAgentEnv(gym.Env):
 
     # set env action for a particular agent
     def _set_action(self, action, agent):
+        # print(action)
+        # action = np.random.choice(a = self.action_set, p = action)
+        # if action == -1:
+        #     agent.action.a = -1
+        # else:
+        #     agent.action.a = agent.state.access[action]
+
         # agent.action.a = action
         if action[0] <= 0.2:
             agent.action.a = -1

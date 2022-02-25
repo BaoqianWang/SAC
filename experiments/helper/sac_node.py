@@ -55,7 +55,7 @@ class accessNodeDiscounted(Node):
         self.ddl = ddl #the initial deadline of each packet
         self.arrivalProb = arrivalProb #the arrival probability at each timestep
         #we use packetQueue to represent the current local state, which is (e_1, e_2, ..., e_d)
-        self.packetQueue = np.zeros(self.ddl, dtype = int) #use 1 to represent a packet with this remaining time, otherwise 0
+        self.packetQueue = [np.random.choice(2) for i in range(self.ddl)]#np.zeros(self.ddl, dtype = int) #use 1 to represent a packet with this remaining time, otherwise 0
         self.accessPoints = accessNetwork.findAccess(i=index) #find and cache the access points this node can access
         self.accessNum = len(self.accessPoints) #the number of access points
         self.actionNum = self.accessNum  + 1 #the number of possible actions
@@ -110,9 +110,11 @@ class accessNodeDiscounted(Node):
         params = self.paramsDict.get(currentState, np.zeros(self.actionNum))
         # compute the probability vector
         probVec = special.softmax(params)
+        print(probVec)
         # randomly select an action based on probVec
         currentAction = self.actionList[np.random.choice(a = self.actionNum, p = probVec)]
-
+        #print(currentAction)
+        
         self.action.append(currentAction)
 
     #oneHopNeighbors is a list of accessNodes
@@ -186,29 +188,29 @@ class accessNodeDiscounted(Node):
     #eta is the learning rate
     def updateParams(self, kHopNeighbors, eta):
         #for t = 0, 1, ..., T, compute the term in g_{i, t}(m) before \nabla
-        mutiplier1 = np.zeros(self.currentTimeStep + 1)
-        for neighbor in kHopNeighbors:
-            for t in range(self.currentTimeStep + 1):
-                neighborKHop = neighbor.kHop[t]
-                neighborQ = neighbor.getQ(neighborKHop)
-                mutiplier1[t] += neighborQ
-
-        for t in range(self.currentTimeStep + 1):
-            mutiplier1[t] *= pow(self.gamma, t)
-            mutiplier1[t] /= self.nodeNum
-
-        #finish constructing mutiplier1
-        #compute the gradient with respect to the parameters associated with s_i(t)
-        for t in range(self.currentTimeStep + 1):
-            currentState = self.state[t]
-            currentAction = self.action[t]
-            params = self.paramsDict.get(currentState, self.defaultPolicy)
-            probVec = special.softmax(params)
-            grad = -probVec
-            actionIndex = self.actionList.index(currentAction)
-            grad[actionIndex] += 1.0
-            self.paramsDict[currentState] = params + eta * mutiplier1[t] * grad
-
+        # mutiplier1 = np.zeros(self.currentTimeStep + 1)
+        # for neighbor in kHopNeighbors:
+        #     for t in range(self.currentTimeStep + 1):
+        #         neighborKHop = neighbor.kHop[t]
+        #         neighborQ = neighbor.getQ(neighborKHop)
+        #         mutiplier1[t] += neighborQ
+        #
+        # for t in range(self.currentTimeStep + 1):
+        #     mutiplier1[t] *= pow(self.gamma, t)
+        #     mutiplier1[t] /= self.nodeNum
+        #
+        # #finish constructing mutiplier1
+        # #compute the gradient with respect to the parameters associated with s_i(t)
+        # for t in range(self.currentTimeStep + 1):
+        #     currentState = self.state[t]
+        #     currentAction = self.action[t]
+        #     params = self.paramsDict.get(currentState, self.defaultPolicy)
+        #     probVec = special.softmax(params)
+        #     grad = -probVec
+        #     actionIndex = self.actionList.index(currentAction)
+        #     grad[actionIndex] += 1.0
+        #     self.paramsDict[currentState] = params + eta * mutiplier1[t] * grad
+        pass
 
     def setBenchmarkPolicy(self,accessNetwork,noactionProb): # set a naive benchmarkPolicy
         proportionAction = []
