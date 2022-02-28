@@ -25,8 +25,8 @@ def parse_args():
     # Core training parameters
     parser.add_argument("--lr", type=float, default=1e-2, help="learning rate for Adam optimizer")
     parser.add_argument("--gamma", type=float, default=0.95, help="discount factor")
-    parser.add_argument("--batch-size", type=int, default=256, help="number of episodes to optimize at the same time")
-    parser.add_argument("--num-units", type=int, default=64, help="number of units in the mlp")
+    parser.add_argument("--batch-size", type=int, default=128, help="number of episodes to optimize at the same time")
+    parser.add_argument("--num-units", type=int, default=32, help="number of units in the mlp")
     # Checkpointing
     parser.add_argument("--save-dir", type=str, default="../trained_policy/", help="directory in which training state and model should be saved")
     parser.add_argument("--save-rate", type=int, default=20, help="save model once every time this number of train are completed")
@@ -45,8 +45,8 @@ def mlp_model(input, num_outputs, scope, reuse=False, num_units=64, rnn_cell=Non
     # This model takes as input an observation and returns values of all actions
     with tf.variable_scope(scope, reuse=reuse):
         out = input
-        # out = layers.fully_connected(out, num_outputs=num_units, activation_fn=tf.nn.relu)
-        # out = layers.fully_connected(out, num_outputs=num_units, activation_fn=tf.nn.relu)
+        out = layers.fully_connected(out, num_outputs=num_units, activation_fn=tf.nn.relu)
+        out = layers.fully_connected(out, num_outputs=num_units, activation_fn=tf.nn.relu)
         out = layers.fully_connected(out, num_outputs=num_outputs, activation_fn=None)
         return out
 
@@ -58,12 +58,12 @@ def make_env(scenario_name, arglist, evaluate=False): ###################
         module_name = "environments.scenarios.{}".format(scenario_name)
         scenario_class = importlib.import_module(module_name).Scenario
         # grid size 3, deadline 2.
-        scenario = scenario_class(3, 20)
+        scenario = scenario_class(3, 100)
     else:
         from environments.environment_neighbor import MultiAgentEnv
         module_name = "environments.scenarios.{}_neighbor".format(scenario_name)
         scenario_class = importlib.import_module(module_name).Scenario
-        scenario = scenario_class(3, 20)
+        scenario = scenario_class(3, 100)
 
     world = scenario.make_world()
     # create multiagent environment
@@ -118,9 +118,10 @@ def evaluate_policy(evaluate_env, trainers, num_episode, display = False):
 
 def interact_with_environments(env, trainers, node_id, steps):
     act_d = env.action_space[0].n
-    for k in range(steps):
-        obs_pot, neighbor = env.reset(node_id) # Neighbor does not include agent itself
 
+    for k in range(steps):
+        #obs_pot, neighbor = env.reset(node_id) # Neighbor does not include agent itself.
+        obs_pot, neighbor = env.reset(node_id)
         action_n = [np.zeros((act_d))] * env.n # Actions for transition
 
         action_neighbor = [np.zeros((act_d))] * arglist.max_num_neighbors #The neighbors include the agent itself
@@ -154,8 +155,8 @@ def interact_with_environments(env, trainers, node_id, steps):
 
         info_n = 0.1
         trainers[node_id].experience(obs_pot[node_id], action_neighbor, new_obs_neighbor[node_id], target_action_neighbor, rew)
-        #print(target_action_neighbor)
 
+        #print(target_action_neighbor)
     return
 
 

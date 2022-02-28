@@ -6,20 +6,24 @@ class Scenario():
         self.grid_size = grid_size
         self.deadlines = deadlines
         self.num_agents = grid_size ** 2
-        self.num_neighbor = 5 # including itself
+        self.num_neighbor = 9 # including itself
 
     def _calc_mask(self, agent, shape_size):
-        delta = [-1, 1]
+        delta = [(-1, 1), (-1, -1), (1, -1), (1, 1)]
         for dt in delta:
             row = agent.state.p_pos[0]
             col = agent.state.p_pos[1]
-            row_dt = row + dt
-            col_dt = col + dt
+            row_dt = row + dt[0]
+            col_dt = col + dt[1]
             if row_dt in range(0, shape_size):
-              agent.spin_mask[agent.state.id + shape_size * dt] = 1
+              agent.spin_mask[agent.state.id + shape_size * dt[0]] = 1
 
             if col_dt in range(0, shape_size):
-              agent.spin_mask[agent.state.id + dt] = 1
+              agent.spin_mask[agent.state.id + dt[1]] = 1
+
+            if row_dt in range(0, shape_size) and col_dt in range(0, shape_size):
+              agent.spin_mask[agent.state.id + shape_size * dt[0] + dt[1]] = 1
+
 
 
     def make_world(self):
@@ -51,6 +55,7 @@ class Scenario():
             #     agent.state.packets[-1] = 1
 
             self._calc_mask(agent, world.shape_size)
+            #print('mask', i, agent.spin_mask)
             agent.neighbors = [i for i in range(self.num_agents) if agent.spin_mask[i] == 1]
             agent.transmit_succ = False
 
@@ -71,6 +76,8 @@ class Scenario():
 
         action_agents = self_agent_neg + neighbor_agent_neighbor + [agent_id]
         action_agents = list(set(action_agents))
+        # print(action_agents)
+        # print(agent_id, self_agent_neg)
         return action_agents, self_agent_neg
 
 

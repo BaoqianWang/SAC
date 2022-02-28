@@ -6,6 +6,6 @@ mpirun -n 10 python3 train_darl1n.py \
     --save-dir="../result/wmc/darl1n/9agents/" \
     --save-rate=10 \
     --max-num-train=200 \
-    --max-num-neighbors=5 \
+    --max-num-neighbors=9 \
     --eva-max-episode-len=25 \
-    --seed=19 \
+    --seed=20 \

@@ -56,6 +56,7 @@ class accessNodeDiscounted(Node):
         self.arrivalProb = arrivalProb #the arrival probability at each timestep
         #we use packetQueue to represent the current local state, which is (e_1, e_2, ..., e_d)
         self.packetQueue = [np.random.choice(2) for i in range(self.ddl)]#np.zeros(self.ddl, dtype = int) #use 1 to represent a packet with this remaining time, otherwise 0
+        #print(self.packetQueue)
         self.accessPoints = accessNetwork.findAccess(i=index) #find and cache the access points this node can access
         self.accessNum = len(self.accessPoints) #the number of access points
         self.actionNum = self.accessNum  + 1 #the number of possible actions
@@ -67,7 +68,7 @@ class accessNodeDiscounted(Node):
         self.actionList = [-1] #(-1, -1) is an empty action that does nothing
         for a in self.accessPoints:
             self.actionList.append(a)
-
+        self.index = index
         # set default policy
         self.defaultPolicy = np.zeros(self.actionNum)
         self.defaultPolicy[0] = 2
@@ -75,14 +76,21 @@ class accessNodeDiscounted(Node):
     #remove the first element in packetQueue, and add packetState to the end
     def rotateAdd(self, packetState):
         #print('self.packetQueue[1:] =',self.packetQueue[1:],'self.ddl = ',self.ddl, 'packetState = ',packetState )
+        #print('before = ',self.packetQueue)
         self.packetQueue = np.insert(self.packetQueue[1:], self.ddl - 1, packetState)
-        #print('new = ',self.packetQueue)
+        #print('after = ',self.packetQueue)
 
     #initialize the local state (called at the beginning of the training process)
     def initializeState(self):
-        newPacketState = np.random.binomial(1, self.arrivalProb) #Is there a packer arriving at time step 0?
+        self.packetQueue = [np.random.choice(2) for i in range(self.ddl)]#np.zeros(self.ddl, dtype = int) #use 1 to represent a packet with this remaining time, otherwise 0
+
+        newPacketState = np.random.choice(2)#np.random.binomial(1, 0.5) #Is there a packer arriving at time step 0?
         self.rotateAdd(newPacketState) #get the packet queue at time step 0
         self.state.append(tuple(self.packetQueue)) #append this state to state record
+        # print('call initializeState')
+        # print(newPacketState)
+        #print(self.index, self.packetQueue)
+        #print(self.index, self.state)
 
     #At each time step t, call updateState, updateAction, updateReward, updateQ in this order
     def updateState(self):
@@ -98,9 +106,10 @@ class accessNodeDiscounted(Node):
                 self.packetQueue[nonEmptySlots[0]] = 0 # earliest packet is sent
 
         #sample whether next packet comes
-        newPacketState = np.random.binomial(1, self.arrivalProb) #Is there a packer arriving at time step 0?
+        newPacketState = np.random.choice(2)#np.random.binomial(1, self.arrivalProb) #Is there a packer arriving at time step 0?
         self.rotateAdd(newPacketState) #get the packet queue at time step 0
         self.state.append(tuple(self.packetQueue)) #append this state to state record
+        # print('update state', self.state)
 
 
     def updateAction(self):
@@ -110,11 +119,11 @@ class accessNodeDiscounted(Node):
         params = self.paramsDict.get(currentState, np.zeros(self.actionNum))
         # compute the probability vector
         probVec = special.softmax(params)
-        print(probVec)
+        #print(probVec)
         # randomly select an action based on probVec
         currentAction = self.actionList[np.random.choice(a = self.actionNum, p = probVec)]
         #print(currentAction)
-        
+
         self.action.append(currentAction)
 
     #oneHopNeighbors is a list of accessNodes
@@ -159,6 +168,7 @@ class accessNodeDiscounted(Node):
     def updateQ(self, kHopNeighbors, alpha):
         lastStateAction = []
         currentStateAction = []
+        #print('neighbors', self.index, len(kHopNeighbors))
         #construct a list of the state-action pairs of k-hop neighbors
         for neighbor in kHopNeighbors:
             neighborLastState = neighbor.state[-2]
@@ -188,29 +198,29 @@ class accessNodeDiscounted(Node):
     #eta is the learning rate
     def updateParams(self, kHopNeighbors, eta):
         #for t = 0, 1, ..., T, compute the term in g_{i, t}(m) before \nabla
-        # mutiplier1 = np.zeros(self.currentTimeStep + 1)
-        # for neighbor in kHopNeighbors:
-        #     for t in range(self.currentTimeStep + 1):
-        #         neighborKHop = neighbor.kHop[t]
-        #         neighborQ = neighbor.getQ(neighborKHop)
-        #         mutiplier1[t] += neighborQ
-        #
-        # for t in range(self.currentTimeStep + 1):
-        #     mutiplier1[t] *= pow(self.gamma, t)
-        #     mutiplier1[t] /= self.nodeNum
-        #
-        # #finish constructing mutiplier1
-        # #compute the gradient with respect to the parameters associated with s_i(t)
-        # for t in range(self.currentTimeStep + 1):
-        #     currentState = self.state[t]
-        #     currentAction = self.action[t]
-        #     params = self.paramsDict.get(currentState, self.defaultPolicy)
-        #     probVec = special.softmax(params)
-        #     grad = -probVec
-        #     actionIndex = self.actionList.index(currentAction)
-        #     grad[actionIndex] += 1.0
-        #     self.paramsDict[currentState] = params + eta * mutiplier1[t] * grad
-        pass
+        mutiplier1 = np.zeros(self.currentTimeStep + 1)
+        for neighbor in kHopNeighbors:
+            for t in range(self.currentTimeStep + 1):
+                neighborKHop = neighbor.kHop[t]
+                neighborQ = neighbor.getQ(neighborKHop)
+                mutiplier1[t] += neighborQ
+
+        for t in range(self.currentTimeStep + 1):
+            mutiplier1[t] *= pow(self.gamma, t)
+            mutiplier1[t] /= self.nodeNum
+
+        #finish constructing mutiplier1
+        #compute the gradient with respect to the parameters associated with s_i(t)
+        for t in range(self.currentTimeStep + 1):
+            currentState = self.state[t]
+            currentAction = self.action[t]
+            params = self.paramsDict.get(currentState, self.defaultPolicy)
+            probVec = special.softmax(params)
+            grad = -probVec
+            actionIndex = self.actionList.index(currentAction)
+            grad[actionIndex] += 1.0
+            self.paramsDict[currentState] = params + eta * mutiplier1[t] * grad
+
 
     def setBenchmarkPolicy(self,accessNetwork,noactionProb): # set a naive benchmarkPolicy
         proportionAction = []

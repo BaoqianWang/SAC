@@ -30,11 +30,11 @@ class MultiAccessNetworkRL:
         #print(T)
         policyRewardList = []
         policyRewardSmooth = []
-
-        for m in trange(M):
+        #print('iteration', M)
+        for m in range(M):
             discountedReward = 0.0 # total reward for this
 
-
+            print('iteration.............', m)
             # restart node
             for i in range(self.nodeNum):
                 if(m == 0):
@@ -42,6 +42,7 @@ class MultiAccessNetworkRL:
                 else:
                     self.nodeList[i].restart(clearPolicy = False, clearQ = False)
                 self.nodeList[i].initializeState()
+                #print('initialize........')
                 self.nodeList[i].updateAction()
 
             tmpReward = 0.0
@@ -54,6 +55,7 @@ class MultiAccessNetworkRL:
             discountedReward += tmpReward/self.nodeNum
 
             for t in range(T):
+                #print(t)
                 for i in range(self.nodeNum): #update state-action
                     self.nodeList[i].updateState()
                     self.nodeList[i].updateAction()
@@ -91,7 +93,7 @@ class MultiAccessNetworkRL:
             # perform a policy evaluation
             if m%evalInterval == 0:
                 policyRewardSmooth.append(self.policyEval(evalM , T ) )
-
+        #print('done')
         return policyRewardSmooth
 
 

@@ -32,9 +32,9 @@ class MultiAgentEnv(gym.Env):
         # configure spaces
         self.action_space = []
         self.observation_space = []
-        for i in range(5):
+        for i in range(9):
             self.action_space.append(spaces.Discrete(2))
-            self.observation_space.append(spaces.MultiBinary(5 * self.world.deadlines))
+            self.observation_space.append(spaces.MultiBinary(9 * self.world.deadlines))
 
 
     def step(self, action_n):
