@@ -40,7 +40,6 @@ class MultiAgentEnv(gym.Env):
 
 
     def step(self, action_n):
-
         agent = self.world.agents[self.agent_id]
         for i in self.action_agents:
             self._set_action(action_n[i], self.agents[i])

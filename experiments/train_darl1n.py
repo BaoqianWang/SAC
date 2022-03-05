@@ -58,12 +58,12 @@ def make_env(scenario_name, arglist, evaluate=False): ###################
         module_name = "environments.scenarios.{}".format(scenario_name)
         scenario_class = importlib.import_module(module_name).Scenario
         # grid size 3, deadline 2.
-        scenario = scenario_class(3, 100)
+        scenario = scenario_class(3, 10)
     else:
         from environments.environment_neighbor import MultiAgentEnv
         module_name = "environments.scenarios.{}_neighbor".format(scenario_name)
         scenario_class = importlib.import_module(module_name).Scenario
-        scenario = scenario_class(3, 100)
+        scenario = scenario_class(3, 10)
 
     world = scenario.make_world()
     # create multiagent environment
@@ -123,7 +123,7 @@ def interact_with_environments(env, trainers, node_id, steps):
         #obs_pot, neighbor = env.reset(node_id) # Neighbor does not include agent itself.
         obs_pot, neighbor = env.reset(node_id)
         action_n = [np.zeros((act_d))] * env.n # Actions for transition
-
+        # print('before', node_id, obs_pot[node_id])
         action_neighbor = [np.zeros((act_d))] * arglist.max_num_neighbors #The neighbors include the agent itself
         target_action_neighbor = [np.zeros((act_d))] * arglist.max_num_neighbors
 
@@ -141,7 +141,7 @@ def interact_with_environments(env, trainers, node_id, steps):
                 if neighbor and i in neighbor and valid_neighbor < arglist.max_num_neighbors:
                     action_neighbor[valid_neighbor] = other_action
                     valid_neighbor += 1
-        #print(action_n)
+
         new_obs_neighbor, rew, done_n, next_info_n = env.step(action_n) # Interaction within the neighbor area
 
         valid_neighbor = 1

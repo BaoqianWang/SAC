@@ -61,7 +61,7 @@ class accessNodeDiscounted(Node):
         self.accessNum = len(self.accessPoints) #the number of access points
         self.actionNum = self.accessNum  + 1 #the number of possible actions
         #print(self.actionNum)
-        self.stateNum = 2** self.ddl # number of possible states
+        self.stateNum = 2**self.ddl # number of possible states
         self.gamma = gamma # discounting factor
         self.nodeNum = nodeNum
         #construct a list of possible actions
@@ -119,7 +119,7 @@ class accessNodeDiscounted(Node):
         params = self.paramsDict.get(currentState, np.zeros(self.actionNum))
         # compute the probability vector
         probVec = special.softmax(params)
-        #print(probVec)
+
         # randomly select an action based on probVec
         currentAction = self.actionList[np.random.choice(a = self.actionNum, p = probVec)]
         #print(currentAction)

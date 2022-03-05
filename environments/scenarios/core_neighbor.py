@@ -74,7 +74,7 @@ class UserWorld(object):
       sent = False
 
 
-      if agent.action.a > 0 and any([value > 0 for value in agent.state.packets]):
+      if agent.action.a >= 0 and any([value > 0 for value in agent.state.packets]):
           sent = True
           for neighbor in agent.neighbors:
               other_agent = self.agents[neighbor]

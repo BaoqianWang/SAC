@@ -263,7 +263,7 @@ class MADDPGAgentTrainer():
     def update(self, agents):
 
         #learning_start_time = time.time()
-        self.replay_sample_index = self.replay_buffer.make_index(1024)
+        self.replay_sample_index = self.replay_buffer.make_index(128)
         # collect replay sample from all agents
         target_q = 0.0
         index = self.replay_sample_index

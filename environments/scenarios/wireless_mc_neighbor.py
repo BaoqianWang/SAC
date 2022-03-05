@@ -41,7 +41,7 @@ class Scenario():
     def reset_world(self, world, agent_id):
         world_mat = np.array(range(np.power(world.shape_size, world.dim_pos)))
         world_mat = world_mat.reshape((world.shape_size,) * world.dim_pos)
-
+        #print('reset')
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
             agent.color = np.array([0.35, 0.35, 0.85])
@@ -94,6 +94,7 @@ class Scenario():
         agent = world.agents[index]
         packets = []
         packets += agent.state.packets
+        #print(index, packets)
         for neighbor in agent.neighbors:
             packets += world.agents[neighbor].state.packets
         packets += [0 for j in range(self.deadlines * (self.num_neighbor - 1 - len(agent.neighbors)))]
