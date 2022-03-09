@@ -102,7 +102,7 @@ class accessNodeDiscounted(Node):
 
         if len(nonEmptySlots) >0: # queue not empty
             #if the reward at the last time step is positive, we have successfully send out a packet
-            if self.reward[-1] > 1 - 1e-3:
+            if self.reward[-1] > 0:
                 self.packetQueue[nonEmptySlots[0]] = 0 # earliest packet is sent
 
         #sample whether next packet comes
@@ -139,6 +139,7 @@ class accessNodeDiscounted(Node):
         if np.all(currentState == 0): # if the current queue is empty
             # zero reward
             self.reward.append(0.0)
+            #return
 
         for neighbor in oneHopNeighbors:
             if neighbor.index == self.index:

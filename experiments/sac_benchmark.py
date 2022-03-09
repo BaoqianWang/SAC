@@ -41,7 +41,7 @@ if __name__ == "__main__":
     np.random.seed()
     k = 1
     policyRewardSmooth = networkRLModel.train(k = k, M = M, T= T, evalInterval = evalInterval,restartIntervalQ = restartIntervalQ, restartIntervalPolicy = restartIntervalPolicy, evalM = evalM, clearPolicy = True)
-    reward_file =  save_dir + 'reward.pkl'
+    reward_file =  save_dir + 'wrong_reward.pkl'
     with open(reward_file, 'wb') as fp:
         pickle.dump(policyRewardSmooth, fp)
 

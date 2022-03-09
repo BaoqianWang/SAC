@@ -90,9 +90,10 @@ class UserWorld(object):
                       break
 
       packets = [value for value in agent.state.packets[1:]]
-      if np.random.uniform() < agent.arrival_rate:
-          packets.append(1)
-      else:
-          packets.append(0)
+      packets.append(np.random.choice(2))
+      # if np.random.uniform() < agent.arrival_rate:
+      #     packets.append(1)
+      # else:
+      #     packets.append(0)
 
       agent.state.packets = packets
