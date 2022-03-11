@@ -2,12 +2,12 @@
 # pass the ssh public key of host to ec2 instances
 
 
-filename='instancesIPaddress'
+filename='nodeIPaddress'
 while read line; do
 echo $line
 #scp -i ~/AmazonEC2/.ssh/linux_key_pari.pem $1 ubuntu@$line:~/darl1n_neurlps/maddpg_o/experiments/
 #scp -i ~/AmazonEC2/.ssh/linux_key_pari.pem $1 ubuntu@$line:~/darl1n_neurlps/maddpg_o/maddpg_local/micro/
-scp -i ~/AmazonEC2/.ssh/linux_key_pari.pem $1 ubuntu@$line:~/darl1n_neurlps/amazon_scripts/
+scp -i ~/AmazonEC2/.ssh/linux_key_pari.pem $1 ubuntu@$line:~/SAC/amazon_scripts/
 #scp -i ~/AmazonEC2/.ssh/linux_key_pari.pem $1 ubuntu@$line:~/darl1n_neurlps/result/grassland/maddpg/
 #scp -i ~/AmazonEC2/.ssh/linux_key_pari.pem $1 ubuntu@$line:~/darl1n_neurlps/train_ising/
 #scp -i ~/AmazonEC2/.ssh/linux_key_pari.pem $1 ubuntu@$line:~/darl1n_neurlps/train_grassland/
