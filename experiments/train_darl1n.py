@@ -228,7 +228,7 @@ if __name__== "__main__":
             print('Computation scheme: ', 'DARL1N')
             print('Scenario: ', arglist.scenario)
             print('Number of agents: ', num_agents)
-            arglist.save_dir = arglist.save_dir + '%d_agents_%d_ddl_%d_iteration/' %(num_agents, arglist.ddl, arglist.max_num_train)
+            arglist.save_dir = arglist.save_dir + '%d_agents_%d_ddl_%d_iteration_%d_seed/' %(num_agents, arglist.ddl, arglist.max_num_train, arglist.seed)
             touch_path(arglist.save_dir)
 
             evaluate_env = make_env(arglist.scenario, arglist, evaluate= True)

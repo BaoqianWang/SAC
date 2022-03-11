@@ -2,7 +2,6 @@ import math
 import random
 import sys
 from scipy import special
-from tqdm import trange
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -46,7 +45,7 @@ if __name__ == "__main__":
 
     M = arglist.max_iteration
     nodeNum = grid_size ** 2
-    save_dir = arglist.save_dir + '%d_agents_%d_ddl_%d_iteration/' %(nodeNum, ddl, evalM)
+    save_dir = arglist.save_dir + '%d_agents_%d_ddl_%d_iteration_%d_seed/' %(nodeNum, ddl, evalM, seed)
     touch_path(save_dir)
     # Set the random seed
     np.random.seed(seed)
@@ -65,7 +64,7 @@ if __name__ == "__main__":
     reward_file =  save_dir +  'reward.pkl'
     time_file = save_dir + 'time.pkl'
 
-    with open(reward_file, 'wb') as fp:
+    with open(rewagit rd_file, 'wb') as fp:
         pickle.dump(policyRewardSmooth, fp)
 
     with open(time_file, 'wb') as fp:

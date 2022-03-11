@@ -4,7 +4,6 @@ from experiments.helper.sac_network import constructGridNetwork
 from experiments.helper.sac_node import accessNodeDiscounted
 from experiments.helper.sac_node import Node
 import numpy as np
-from tqdm import trange
 import time
 
 class MultiAccessNetworkRL:
