@@ -5,6 +5,7 @@ from experiments.helper.sac_node import accessNodeDiscounted
 from experiments.helper.sac_node import Node
 import numpy as np
 from tqdm import trange
+import time
 
 class MultiAccessNetworkRL:
     def __init__(self,ddl = 2, graphType = 'line', nodeNum = 10, maxK = 3 ,arrivalProb = None, transmitProb = 'random', gridW = 1, gridH = 1, gamma = 0.7):
@@ -27,10 +28,13 @@ class MultiAccessNetworkRL:
 
     def train(self, k = 1, M = 10000, T = 20, evalInterval = 500, restartIntervalQ = 50, restartIntervalPolicy = 50, evalM = 500, clearPolicy = True):
 
-        #print(T)
+        # print(T)
         policyRewardList = []
         policyRewardSmooth = []
+        global_time = []
         #print('iteration', M)
+        start_time = time.time()
+
         for m in range(M):
             discountedReward = 0.0 # total reward for this
 
@@ -92,9 +96,12 @@ class MultiAccessNetworkRL:
 
             # perform a policy evaluation
             if m%evalInterval == 0:
-                policyRewardSmooth.append(self.policyEval(evalM , T ) )
+                end_time = time.time()
+                policyRewardSmooth.append(self.policyEval(evalM, T))
+                global_time.append(end_time - start_time)
+
         #print('done')
-        return policyRewardSmooth
+        return policyRewardSmooth, global_time
 
 
     def policyEval(self, evalM, T):
@@ -134,10 +141,3 @@ class MultiAccessNetworkRL:
             discountedReward.append(tmpReward)
 
         return np.mean(discountedReward)
-
-
-    def evaluateBenchmarkPolicy(self, evalM, T, noactionProb):
-        for i in range(self.nodeNum):
-            self.nodeList[i].setBenchmarkPolicy(self.accessNetwork, noactionProb)
-
-        return self.policyEval(evalM ,T)

@@ -38,6 +38,7 @@ def parse_args():
     parser.add_argument("--num-learners", type=int, default="0", help="num learners")
     parser.add_argument("--max-num-neighbors", type=int, default="0", help="maximum number of  agents in neighbors area")
     parser.add_argument("--seed", type=int, default="1", help="seed for random number")
+    parser.add_argument("--ddl", type=int, default="2", help="deadline")
     return parser.parse_args()
 
 
@@ -58,12 +59,12 @@ def make_env(scenario_name, arglist, evaluate=False): ###################
         module_name = "environments.scenarios.{}".format(scenario_name)
         scenario_class = importlib.import_module(module_name).Scenario
         # grid size 3, deadline 2.
-        scenario = scenario_class(3, 10)
+        scenario = scenario_class(int(np.sqrt(arglist.num_agents)), arglist.ddl)
     else:
         from environments.environment_neighbor import MultiAgentEnv
         module_name = "environments.scenarios.{}_neighbor".format(scenario_name)
         scenario_class = importlib.import_module(module_name).Scenario
-        scenario = scenario_class(3, 10)
+        scenario = scenario_class(int(np.sqrt(arglist.num_agents)), arglist.ddl)
 
     world = scenario.make_world()
     # create multiagent environment
@@ -227,9 +228,9 @@ if __name__== "__main__":
             print('Computation scheme: ', 'DARL1N')
             print('Scenario: ', arglist.scenario)
             print('Number of agents: ', num_agents)
+            arglist.save_dir = arglist.save_dir + '%d_agents_%d_ddl_%d_iteration/' %(num_agents, arglist.ddl, arglist.max_num_train)
             touch_path(arglist.save_dir)
-            # if arglist.load_dir == "":
-            #     arglist.load_dir = arglist.save_dir
+
             evaluate_env = make_env(arglist.scenario, arglist, evaluate= True)
 
         comm.Barrier()

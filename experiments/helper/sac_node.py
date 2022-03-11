@@ -103,7 +103,7 @@ class accessNodeDiscounted(Node):
         if len(nonEmptySlots) >0: # queue not empty
             #if the reward at the last time step is positive, we have successfully send out a packet
             if self.reward[-1] > 0:
-                self.packetQueue[nonEmptySlots[0]] = 0 # earliest packet is sent
+                self.packetQueue[nonEmptySlots[0][0]] = 0 # earliest packet is sent
 
         #sample whether next packet comes
         newPacketState = np.random.choice(2)#np.random.binomial(1, self.arrivalProb) #Is there a packer arriving at time step 0?
@@ -139,7 +139,7 @@ class accessNodeDiscounted(Node):
         if np.all(currentState == 0): # if the current queue is empty
             # zero reward
             self.reward.append(0.0)
-            #return
+            return
 
         for neighbor in oneHopNeighbors:
             if neighbor.index == self.index:
@@ -222,30 +222,6 @@ class accessNodeDiscounted(Node):
             grad[actionIndex] += 1.0
             self.paramsDict[currentState] = params + eta * mutiplier1[t] * grad
 
-
-    def setBenchmarkPolicy(self,accessNetwork,noactionProb): # set a naive benchmarkPolicy
-        proportionAction = []
-        for actionCounter in range(self.actionNum):
-            if self.actionList[actionCounter] == -1:
-                proportionAction.append(np.log(100*noactionProb/4.0))
-            else:
-                numNodePerAccess = float(accessNetwork.numNodePerAccess[self.actionList[actionCounter]])
-                transmitProb = float(accessNetwork.transmitProb[self.actionList[actionCounter]])
-                print('numNodePerAccess = ',numNodePerAccess,' transmitProb = ',transmitProb)
-                proportionAction.append( np.log(100*transmitProb/numNodePerAccess))
-
-
-        for stateInt in range(self.stateNum): # enumerate state
-            currentState = self.int2state(stateInt) # turn state integer into binary list
-            actionParams = np.ones(self.actionNum,dtype = float) * (-10) # default to be all negative
-
-
-            if np.all( currentState == 0): # no packet in queue
-                actionParams[0] = 10.0 # do nothing
-            else:
-                actionParams = np.array(proportionAction) # proportional action
-            # update paramsDict
-            self.paramsDict[tuple(currentState)] = actionParams
 
 
 
