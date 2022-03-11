@@ -1,6 +1,6 @@
 #!/bin/sh
 python3 sac_benchmark.py \
-    --max-iteration=3000 \
+    --max-iteration=1000 \
     --evalM=15  \
     --save-dir="../result/wmc/sac/" \
     --save-rate=200 \

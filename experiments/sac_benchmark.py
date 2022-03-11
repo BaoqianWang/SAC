@@ -73,6 +73,7 @@ if __name__ == "__main__":
 
 
     plt.figure(figsize=(5.8,4.5))
+    font_size = 18
     plt.plot(global_time, policyRewardSmooth, linestyle=':', linewidth=2, label='SAC')
     plt.ylabel('Reward', fontsize=font_size)
     plt.xlabel('Training iteration', fontsize=font_size)
