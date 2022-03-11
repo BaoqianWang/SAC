@@ -37,7 +37,7 @@ class MultiAccessNetworkRL:
         for m in range(M):
             discountedReward = 0.0 # total reward for this
 
-            print('iteration.............', m)
+            #print('iteration.............', m)
             # restart node
             for i in range(self.nodeNum):
                 if(m == 0):
@@ -96,8 +96,10 @@ class MultiAccessNetworkRL:
             # perform a policy evaluation
             if m%evalInterval == 0:
                 end_time = time.time()
-                policyRewardSmooth.append(self.policyEval(evalM, T))
+                eval_reward = self.policyEval(evalM, T)
+                policyRewardSmooth.append(eval_reward)
                 global_time.append(end_time - start_time)
+                print('Training iteration', m, 'Training time', end_time - start_time , 'Training reward', eval_reward)
 
         #print('done')
         return policyRewardSmooth, global_time

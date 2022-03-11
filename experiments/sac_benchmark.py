@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     M = arglist.max_iteration
     nodeNum = grid_size ** 2
-    save_dir = arglist.save_dir + '%d_agents_%d_ddl_%d_iteration_%d_seed/' %(nodeNum, ddl, evalM, seed)
+    save_dir = arglist.save_dir + '%d_agents_%d_ddl_%d_iteration_%d_seed/' %(nodeNum, ddl, M, seed)
     touch_path(save_dir)
     # Set the random seed
     np.random.seed(seed)
@@ -64,23 +64,23 @@ if __name__ == "__main__":
     reward_file =  save_dir +  'reward.pkl'
     time_file = save_dir + 'time.pkl'
 
-    with open(rewagit rd_file, 'wb') as fp:
+    with open(reward_file, 'wb') as fp:
         pickle.dump(policyRewardSmooth, fp)
 
     with open(time_file, 'wb') as fp:
         pickle.dump(global_time, fp)
 
 
-    plt.figure(figsize=(5.8,4.5))
-    font_size = 18
-    plt.plot(global_time, policyRewardSmooth, linestyle=':', linewidth=2, label='SAC')
-    plt.ylabel('Reward', fontsize=font_size)
-    plt.xlabel('Training iteration', fontsize=font_size)
-    plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
-    plt.legend(fontsize=font_size-2)
-    plt.xticks(fontsize=font_size)
-    plt.yticks(fontsize=font_size)
-    plt.subplots_adjust(bottom=0.15, left=0.2, top=0.95, wspace=0, hspace=0)
-    plt.grid()
+    # plt.figure(figsize=(5.8,4.5))
+    # font_size = 18
+    # plt.plot(global_time, policyRewardSmooth, linestyle=':', linewidth=2, label='SAC')
+    # plt.ylabel('Reward', fontsize=font_size)
+    # plt.xlabel('Training iteration', fontsize=font_size)
+    # plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    # plt.legend(fontsize=font_size-2)
+    # plt.xticks(fontsize=font_size)
+    # plt.yticks(fontsize=font_size)
+    # plt.subplots_adjust(bottom=0.15, left=0.2, top=0.95, wspace=0, hspace=0)
+    # plt.grid()
     #plt.savefig('../figures/sac0308', transparent = False)
-    plt.show()
+    #plt.show()
